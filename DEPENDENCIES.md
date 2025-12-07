@@ -27,7 +27,7 @@ Per the terms of the GNU General Public License (GPL) and Lesser General Public 
 * **Source Repository:** [https://github.com/aria2/aria2](https://github.com/aria2/aria2)
 
 **Usage in this project (Preferred/Mere Aggregation):**
-This tool is **optional**. The script attempts to use `aria2c.exe` first for optimized downloading. If the binary is **not found** at runtime, the script will automatically **use a slower, built-in download method** and continue execution without stopping. It is executed as an external, stand-alone program and is **not linked**, embedded, or modified by this project's code.
+This tool is **optional**. The script attempts to use `aria2c.exe` first for optimized downloading. If the binary is **not found** at runtime, the script will automatically **use a fallback, built-in download method** and continue execution without stopping. It is executed as an external, stand-alone program and is **not linked**, embedded, or modified by this project's code.
 
 ---
 
