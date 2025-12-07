@@ -1,6 +1,8 @@
 # 🦊 Firefox Portable Updater
 
-A simple, self-contained updater script for automatically installing and updating a portable version of the Firefox web browser for Windows, ensuring user profile and settings are preserved across updates.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+A simple, self-contained updater script for automatically installing and updating a portable version of the stable build of [Firefox](https://www.firefox.com/) web browser for Windows, ensuring user profile and settings are preserved across updates.
 
 ---
 
