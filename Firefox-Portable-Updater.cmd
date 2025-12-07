@@ -102,11 +102,11 @@ echo             "--auto-file-renaming=false",
 echo             "--summary-interval=0",
 echo             "--user-agent=Mozilla/5.0"
 echo         ^)
-echo         Write-Host "Downloading with aria2c ^(8 connections^)...`n"
+echo         Write-Host "Downloading with aria2 ^(8 connections^)...`n"
 echo         $process = Start-Process -FilePath $Aria2Path -ArgumentList $arguments -NoNewWindow -Wait -PassThru
 echo         return $process.ExitCode -eq 0
 echo     } catch {
-echo         Write-Host "aria2c download failed: $_"
+echo         Write-Host "aria2 download failed: $_"
 echo         return $false
 echo     }
 echo }
@@ -270,9 +270,9 @@ echo     exit 1
 echo }
 echo $aria2Path = Find-Aria2
 echo if ^($aria2Path^) {
-echo     Write-Host "Found aria2c: $aria2Path"
+echo     Write-Host "Found aria2: $aria2Path"
 echo } else {
-echo     Write-Host "aria2c not found, using default download method"
+echo     Write-Host "aria2 not found, using default download method"
 echo }
 echo $baseDir = "%~dp0".TrimEnd^('\'^)
 echo Write-Host "Working directory: $baseDir`n"
