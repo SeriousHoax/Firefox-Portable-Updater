@@ -10,7 +10,7 @@ Per the terms of the GNU General Public License (GPL) and Lesser General Public 
 
 * **Utility:** 7-Zip command-line archiving tool.
 * **License:** **GNU Lesser General Public License, Version 2.1 or later (LGPLv2.1+)**
-    * *Note: This utility includes code licensed under the BSD 3-clause License, and the UnRAR code is subject to specific licensing restrictions.*
+  * *Note: This utility includes code licensed under the BSD 3-clause License, and the UnRAR code is subject to specific licensing restrictions.*
 * **Project Homepage:** [https://www.7-zip.org/](https://www.7-zip.org/)
 * **Source Code Download:** [https://www.7-zip.org/download.html](https://www.7-zip.org/download.html)
 
