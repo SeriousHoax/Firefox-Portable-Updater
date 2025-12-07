@@ -80,11 +80,11 @@ def download_with_aria2(url, dest, aria2_path):
             "--summary-interval=0",
             "--user-agent=Mozilla/5.0"
         ]
-        print("Downloading with aria2c (8 connections)...\n")
+        print("Downloading with aria2 (8 connections)...\n")
         result = subprocess.run(args, check=True)
         return result.returncode == 0
     except Exception as e:
-        print(f"aria2c download failed: {e}")
+        print(f"aria2 download failed: {e}")
         return False
 def download(url, dest, aria2_path=None):
     if aria2_path:
@@ -227,9 +227,9 @@ def main():
         sys.exit(1)
     aria2_path = find_aria2()
     if aria2_path:
-        print(f"Found aria2c: {aria2_path}")
+        print(f"Found aria2: {aria2_path}")
     else:
-        print("aria2c not found, using default download method")
+        print("aria2 not found, using default download method")
     base_dir = Path(__file__).parent.absolute()
     print(f"Working directory: {base_dir}\n")
     success = install_firefox(base_dir, seven, aria2_path)
