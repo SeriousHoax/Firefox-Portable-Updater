@@ -165,16 +165,16 @@ echo user_pref^("app.update.service.enabled", false^);
 echo user_pref^("app.update.staging.enabled", false^);
 echo user_pref^("app.update.silent", false^);
 echo '@
-echo     $prefsJs = Join-Path $profileDir "prefs.js"
-echo     if ^(Test-Path $prefsJs^) {
-echo         $existing = Get-Content $prefsJs -Raw
+echo     $userJs = Join-Path $profileDir "user.js"
+echo     if ^(Test-Path $userJs^) {
+echo         $existing = Get-Content $userJs -Raw
 echo         if ^($existing -notmatch "app.update.enabled"^) {
-echo             Add-Content -Path $prefsJs -Value "`n$prefsContent"
+echo             Add-Content -Path $userJs -Value "`n$prefsContent"
 echo         }
 echo     } else {
-echo         Set-Content -Path $prefsJs -Value $prefsContent
+echo         Set-Content -Path $userJs -Value $prefsContent
 echo     }
-echo     Write-Host "Profile preferences configured ^(updates disabled^)"
+echo     Write-Host "Profile preferences configured ^(updates disabled via user.js^)"
 echo }
 echo.
 echo function New-Shortcut {

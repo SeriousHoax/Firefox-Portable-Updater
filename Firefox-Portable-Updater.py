@@ -119,8 +119,8 @@ def disable_updates(base_dir):
     policies_file = distribution_dir / "policies.json"
     policies_file.write_text(json.dumps(policies, indent=2))
     print("Enterprise policies configured (updates disabled)")
-    prefs_js = profile_dir / "prefs.js"
-    prefs_content = '''user_pref("browser.shell.checkDefaultBrowser", false);
+    user_js = profile_dir / "user.js"
+    user_prefs_content = '''user_pref("browser.shell.checkDefaultBrowser", false);
 user_pref("app.update.enabled", false);
 user_pref("app.update.auto", false);
 user_pref("app.update.checkInstallTime", false);
@@ -128,13 +128,13 @@ user_pref("app.update.service.enabled", false);
 user_pref("app.update.staging.enabled", false);
 user_pref("app.update.silent", false);
 '''
-    if prefs_js.exists():
-        existing = prefs_js.read_text()
+    if user_js.exists():
+        existing = user_js.read_text()
         if "app.update.enabled" not in existing:
-            prefs_js.write_text(existing + "\n" + prefs_content)
+            user_js.write_text(existing + "\n" + user_prefs_content)
     else:
-        prefs_js.write_text(prefs_content)
-    print("Profile preferences configured (updates disabled)")
+        user_js.write_text(user_prefs_content)
+    print("Profile preferences configured (updates disabled via user.js)")
 def create_shortcut(base_dir):
     shortcut_path = base_dir / "Firefox Portable.lnk"
     exe_path = base_dir / "Firefox" / "core" / "firefox.exe"
