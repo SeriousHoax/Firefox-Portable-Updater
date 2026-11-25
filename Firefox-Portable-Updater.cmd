@@ -36,7 +36,7 @@ set "TEMP_PS1=%~dp0.temp-firefox-portable.ps1"
 (
 echo $ErrorActionPreference = "Stop"
 echo $LatestUrl = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
-echo $VersionedUrlTemplate = "https://releases.mozilla.org/pub/firefox/releases/{0}/win64/en-US/Firefox%20Setup%20{0}.exe"
+echo $VersionedUrlTemplate = "https://releases.mozilla.org/pub/firefox/releases/{0}/win64/en-US/Firefox%%20Setup%%20{0}.exe"
 echo $TargetVersion = "!TARGET_VERSION!"
 echo.
 echo function Find-7Zip {
@@ -126,8 +126,8 @@ echo             "--summary-interval=0",
 echo             "--user-agent=Mozilla/5.0"
 echo         ^)
 echo         Write-Host "Downloading with aria2 ^(8 connections^)...`n"
-echo         $process = Start-Process -FilePath $Aria2Path -ArgumentList $arguments -NoNewWindow -Wait -PassThru
-echo         return $process.ExitCode -eq 0
+echo         ^& $Aria2Path @arguments
+echo         return ^($LASTEXITCODE -eq 0^)
 echo     } catch {
 echo         Write-Host "aria2 download failed: $_"
 echo         return $false
