@@ -7,14 +7,37 @@
 :: Dependencies:
 :: - 7zr.exe (Required for extraction)
 :: - aria2c.exe (Optional for faster downloading)
+::
+:: Usage:
+::   Firefox-Portable-Updater.cmd                   -- install/update to latest
+::   Firefox-Portable-Updater.cmd --version 160.0   -- install/downgrade to 160.0
+::   Firefox-Portable-Updater.cmd -v 160.0          -- same, short form
 :: =========================================================================
 
 @echo off
 setlocal EnableDelayedExpansion
+
+:: Parse --version / -v argument
+set "TARGET_VERSION="
+:parse_args
+if "%~1"=="" goto done_args
+if /i "%~1"=="--version" (
+    set "TARGET_VERSION=%~2"
+    shift & shift & goto parse_args
+)
+if /i "%~1"=="-v" (
+    set "TARGET_VERSION=%~2"
+    shift & shift & goto parse_args
+)
+shift & goto parse_args
+:done_args
+
 set "TEMP_PS1=%~dp0.temp-firefox-portable.ps1"
 (
 echo $ErrorActionPreference = "Stop"
-echo $URL = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+echo $LatestUrl = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+echo $VersionedUrlTemplate = "https://releases.mozilla.org/pub/firefox/releases/{0}/win64/en-US/Firefox%20Setup%20{0}.exe"
+echo $TargetVersion = "!TARGET_VERSION!"
 echo.
 echo function Find-7Zip {
 echo     $path = Join-Path $PSScriptRoot "Dependencies\7zr.exe"
@@ -200,26 +223,43 @@ echo     $coreDir = Join-Path $installDir "core"
 echo     $profileDir = Join-Path $installDir "profile"
 echo     $exe = Join-Path $coreDir "firefox.exe"
 echo     $currentVer = if ^(Test-Path $exe^) { Get-LocalVersion ^(Get-Item $exe^) } else { $null }
-echo     $remoteVer = Get-RemoteVersion $URL
-echo     Write-Host "Debug: Current='$currentVer' Remote='$remoteVer'"
-echo     if ^($currentVer^) {
-echo         Write-Host "Installed: $currentVer, Remote: $remoteVer"
-echo         $match = Compare-Versions $currentVer $remoteVer
-echo         Write-Host "Debug: Version match = $match"
-echo         if ^($match^) {
-echo             Write-Host "Firefox is up to date"
-echo             Disable-Updates $BaseDir
-echo             return $true
+echo.
+echo     if ^($TargetVersion^) {
+echo         $url = $VersionedUrlTemplate -f $TargetVersion
+echo         Write-Host "Target version: $TargetVersion"
+echo         if ^($currentVer^) {
+echo             Write-Host "Installed: $currentVer"
+echo             if ^(Compare-Versions $currentVer $TargetVersion^) {
+echo                 Write-Host "Firefox $TargetVersion is already installed"
+echo                 Disable-Updates $BaseDir
+echo                 return $true
+echo             }
 echo         }
-echo         Write-Host "Updating Firefox..."
+echo         $action = if ^($currentVer^) { "Downgrading" } else { "Installing" }
+echo         Write-Host "$action Firefox to $TargetVersion..."
 echo     } else {
-echo         Write-Host "Installing Firefox..."
+echo         $url = $LatestUrl
+echo         $remoteVer = Get-RemoteVersion $url
+echo         Write-Host "Debug: Current='$currentVer' Remote='$remoteVer'"
+echo         if ^($currentVer^) {
+echo             Write-Host "Installed: $currentVer, Remote: $remoteVer"
+echo             $match = Compare-Versions $currentVer $remoteVer
+echo             Write-Host "Debug: Version match = $match"
+echo             if ^($match^) {
+echo                 Write-Host "Firefox is up to date"
+echo                 Disable-Updates $BaseDir
+echo                 return $true
+echo             }
+echo             Write-Host "Updating Firefox..."
+echo         } else {
+echo             Write-Host "Installing Firefox..."
+echo         }
 echo     }
 echo     $tempDir = Join-Path $BaseDir "temp"
 echo     New-Item -ItemType Directory -Force -Path $tempDir ^| Out-Null
 echo     $installer = Join-Path $tempDir "installer.exe"
 echo     try {
-echo         Get-FileDownload $URL $installer $Aria2Path
+echo         Get-FileDownload $url $installer $Aria2Path
 echo         Write-Host "Extracting..."
 echo         $extractDir = Join-Path $tempDir "extract"
 echo         New-Item -ItemType Directory -Force -Path $extractDir ^| Out-Null

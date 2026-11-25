@@ -12,7 +12,8 @@ Dependencies:
 import sys, os, shutil, subprocess, re, json, time, msvcrt
 from pathlib import Path
 from urllib.request import urlopen, Request
-URL = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+LATEST_URL = "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US"
+VERSIONED_URL = "https://releases.mozilla.org/pub/firefox/releases/{version}/win64/en-US/Firefox%20Setup%20{version}.exe"
 def find_7zip():
     base_dir = Path(__file__).parent.absolute()
     path = base_dir / "Dependencies" / "7zr.exe"
@@ -156,30 +157,44 @@ $shortcut.Save()
         print(f"Shortcut created: {shortcut_path}")
     except:
         print("Warning: Could not create shortcut")
-def install_firefox(base_dir, seven, aria2_path=None):
+def install_firefox(base_dir, seven, aria2_path=None, target_version=None):
     install_dir = base_dir / "Firefox"
     core_dir = install_dir / "core"
     profile_dir = install_dir / "profile"
     exe = core_dir / "firefox.exe"
     current_ver = get_version(exe) if exe.exists() else None
-    remote_ver = get_remote_version(URL)
-    print(f"Debug: Current='{current_ver or ''}' Remote='{remote_ver or ''}'")
-    if current_ver:
-        print(f"Installed: {current_ver}, Remote: {remote_ver}")
-        match = compare_versions(current_ver, remote_ver)
-        print(f"Debug: Version match = {match}")
-        if match:
-            print("Firefox is up to date")
-            disable_updates(base_dir)
-            return True
-        print("Updating Firefox...")
+
+    if target_version:
+        # Downgrade / pin to a specific version
+        url = VERSIONED_URL.format(version=target_version)
+        print(f"Target version: {target_version}")
+        if current_ver:
+            print(f"Installed: {current_ver}")
+            if compare_versions(current_ver, target_version):
+                print(f"Firefox {target_version} is already installed")
+                disable_updates(base_dir)
+                return True
+        print(f"{'Downgrading' if current_ver else 'Installing'} Firefox to {target_version}...")
     else:
-        print("Installing Firefox...")
+        url = LATEST_URL
+        remote_ver = get_remote_version(url)
+        print(f"Debug: Current='{current_ver or ''}' Remote='{remote_ver or ''}'")
+        if current_ver:
+            print(f"Installed: {current_ver}, Remote: {remote_ver}")
+            match = compare_versions(current_ver, remote_ver)
+            print(f"Debug: Version match = {match}")
+            if match:
+                print("Firefox is up to date")
+                disable_updates(base_dir)
+                return True
+            print("Updating Firefox...")
+        else:
+            print("Installing Firefox...")
     temp_dir = base_dir / "temp"
     temp_dir.mkdir(exist_ok=True)
     installer = temp_dir / "installer.exe"
     try:
-        download(URL, installer, aria2_path)
+        download(url, installer, aria2_path)
         print("Extracting...")
         extract_dir = temp_dir / "extract"
         extract_dir.mkdir(exist_ok=True)
@@ -220,6 +235,20 @@ def main():
     if os.name != "nt":
         print("Windows only")
         sys.exit(1)
+
+    # Parse optional --version / -v argument
+    target_version = None
+    args = sys.argv[1:]
+    i = 0
+    while i < len(args):
+        if args[i] in ("--version", "-v") and i + 1 < len(args):
+            target_version = args[i + 1].strip()
+            i += 2
+        else:
+            i += 1
+    if target_version:
+        print(f"Version override: will install/downgrade to Firefox {target_version}")
+
     seven = find_7zip()
     if not seven:
         print("Error: 7zr.exe not found in Dependencies folder.")
@@ -232,7 +261,7 @@ def main():
         print("aria2 not found, using default download method")
     base_dir = Path(__file__).parent.absolute()
     print(f"Working directory: {base_dir}\n")
-    success = install_firefox(base_dir, seven, aria2_path)
+    success = install_firefox(base_dir, seven, aria2_path, target_version)
     create_shortcut(base_dir)
     if success:
         print("\033[92m\nSuccess! Closing in 3 seconds...\033[0m")
@@ -253,3 +282,4 @@ def main():
         input()
 if __name__ == "__main__":
     main()
+    
